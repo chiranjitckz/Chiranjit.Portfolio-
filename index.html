@@ -95,6 +95,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:18px 0;background:rg
 /* ABOUT */
 #about{background:#0c0c0c}
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+.about-bio{max-height:135px;overflow:hidden;position:relative;transition:max-height 0.6s cubic-bezier(0.16,1,0.3,1)}
+.about-bio.expanded{max-height:600px}
+.about-bio::after{content:'';position:absolute;bottom:0;left:0;right:0;height:56px;background:linear-gradient(transparent,#0c0c0c);pointer-events:none;transition:opacity 0.3s ease}
+.about-bio.expanded::after{opacity:0}
+.read-more-btn{display:inline-flex;align-items:center;gap:7px;background:none;border:none;color:#4f9dff;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;letter-spacing:0.03em;cursor:pointer;padding:2px 0 22px;transition:gap 0.2s}
+.read-more-btn:hover{gap:10px}
+.read-more-btn svg{transition:transform 0.35s cubic-bezier(0.16,1,0.3,1)}
+.read-more-btn.expanded svg{transform:rotate(180deg)}
+.about-side{position:sticky;top:104px}
 .about-p{font-size:1.05rem;font-weight:300;color:#bbb;line-height:1.85;margin-bottom:16px}
 .about-p strong{color:#e0dbd4;font-weight:500}
 .about-p .gold{color:#4f9dff}
@@ -131,8 +140,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:18px 0;background:rg
 #projects{background:#0c0c0c}
 .proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;align-items:start}
 .proj-card{background:#0f0f0f;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:32px 30px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s,background 0.3s}
-.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4f9dff,transparent);opacity:0;transition:opacity 0.3s}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4f9dff,transparent);opacity:0;transition:opacity 0.3s;z-index:2}
+.proj-card::after{content:'';position:absolute;inset:0;background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),rgba(79,157,255,0.08),transparent 65%);opacity:0;transition:opacity 0.4s ease;pointer-events:none;z-index:1}
+.proj-card:hover::after{opacity:1}
 .proj-card:hover{border-color:rgba(79,157,255,0.25);background:#111;transform:translateY(-4px)}
+.proj-card>*{position:relative;z-index:2}
 .proj-card:hover::before{opacity:1}
 .proj-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px}
 .proj-num{font-family:'Playfair Display',serif;font-size:0.95rem;font-style:italic;color:#555}
@@ -195,7 +207,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:18px 0;background:rg
 #goals{background:#0c0c0c}
 .goals-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
 .gc{background:#0f0f0f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:34px 30px;position:relative;overflow:hidden;transition:background 0.25s,transform 0.25s;cursor:default}
+.gc::before{content:'';position:absolute;inset:0;background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),rgba(79,157,255,0.08),transparent 65%);opacity:0;transition:opacity 0.4s ease;pointer-events:none}
+.gc:hover::before{opacity:1}
 .gc:hover{background:#111;transform:translateY(-4px)}
+.gc>*:not(.gc-wm){position:relative;z-index:1}
 .gc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#1e4f91,#4f9dff)}
 .gc-wm{position:absolute;bottom:8px;right:16px;font-family:'Playfair Display',serif;font-size:5.5rem;font-weight:700;color:rgba(255,255,255,0.025);line-height:1;pointer-events:none;user-select:none}
 .gc-period{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#777;margin-bottom:9px}
@@ -267,6 +282,7 @@ footer{background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:26
   .hero-text{padding:50px 40px;max-width:100%}
   .hero-photo{height:65vw;min-height:320px;max-height:520px}
   .about-grid{grid-template-columns:1fr;gap:44px}
+  .about-side{position:static}
   .sk-row{grid-template-columns:38px 1fr 68px}.sk-row .sk-bar{display:none}
   .proj-grid{grid-template-columns:1fr}
   .cyber-grid{grid-template-columns:1fr;gap:44px}
@@ -287,12 +303,12 @@ footer{background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:26
   .sec{padding:68px 0}
   .hero-stats{flex-direction:column;gap:14px}
   .hstat+.hstat{border-left:none;border-top:1px solid rgba(255,255,255,0.08);padding-left:0;padding-top:14px}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .btn-solid,.btn-border{text-align:center}
 }
 @media(max-width:480px){
   .hero-name{font-size:2.8rem}.hero-name-em{font-size:2.8rem}
   .hero-photo{height:85vw;min-height:260px}
-  .hero-btns{flex-direction:column}
-  .btn-solid,.btn-border{text-align:center}
   .sec{padding:54px 0}
   .contact-big{font-size:2rem}
   .foot-inner{flex-direction:column;align-items:flex-start}
@@ -367,9 +383,15 @@ footer{background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:26
     <h2 class="sec-title">Driven by curiosity,<br><em>built on code</em></h2>
     <div class="about-grid">
       <div>
-        <p class="about-p">I'm <strong>Chiranjit Chakma</strong>, a <span class="gold">BSc Physics, Mathematics &amp; Computer Science</span> student at Amrita Vishwa Vidyapeetham, Mysore. My academic foundation gives me a rare blend of analytical depth and technical problem-solving.</p>
-        <p class="about-p">I work as an <strong>AI-assisted developer</strong> — using tools like <strong>Claude, ChatGPT, DeepSeek, Grok</strong> as force multipliers. I ship faster, learn deeper, and build smarter by collaborating with AI effectively.</p>
-        <p class="about-p">My ultimate goal is to become a <strong>certified expert in artificial intelligence and cybersecurity</strong>, specialising in ethical hacking, network security, digital forensics, and AI-driven systems — and I'd welcome the opportunity to pursue postgraduate studies in Australia or another globally recognised destination to gain advanced knowledge, practical experience, and international exposure that will help me achieve my career aspirations in cybersecurity and artificial intelligence.</p>
+        <div class="about-bio" id="aboutBio">
+          <p class="about-p">I'm <strong>Chiranjit Chakma</strong>, a <span class="gold">BSc Physics, Mathematics &amp; Computer Science</span> student at Amrita Vishwa Vidyapeetham, Mysore. My academic foundation gives me a rare blend of analytical depth and technical problem-solving.</p>
+          <p class="about-p">I work as an <strong>AI-assisted developer</strong> — using tools like <strong>Claude, ChatGPT, DeepSeek, Grok</strong> as force multipliers. I ship faster, learn deeper, and build smarter by collaborating with AI effectively.</p>
+          <p class="about-p">My ultimate goal is to become a <strong>certified expert in artificial intelligence and cybersecurity</strong>, specialising in ethical hacking, network security, digital forensics, and AI-driven systems — and I'd welcome the opportunity to pursue postgraduate studies in Australia or another globally recognised destination to gain advanced knowledge, practical experience, and international exposure that will help me achieve my career aspirations in cybersecurity and artificial intelligence.</p>
+        </div>
+        <button class="read-more-btn" id="bioToggle" onclick="toggleBio()">
+          <span>Read More</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6,9 12,15 18,9"/></svg>
+        </button>
         <div class="about-info">
           <div class="ai-cell"><div class="ai-lbl">University</div><div class="ai-val">Amrita Vishwa Vidyapeetham</div></div>
           <div class="ai-cell"><div class="ai-lbl">Degree</div><div class="ai-val">BSc PMCS</div></div>
@@ -380,7 +402,7 @@ footer{background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:26
           <span class="atag">Cybersecurity</span><span class="atag">Ethical Hacking</span><span class="atag">AI Development</span><span class="atag">Kali Linux</span><span class="atag">Network Security</span><span class="atag">Web Development</span><span class="atag">Logical Thinking</span>
         </div>
       </div>
-      <div>
+      <div class="about-side">
         <div class="about-quote reveal"><div class="aq-text">"The best way to predict the future is to build it."</div><div class="aq-attr">Guiding Principle</div></div>
         <div class="about-stats reveal">
           <div class="as-item reveal"><div class="as-n">4+</div><div class="as-l">Projects</div></div>
@@ -533,6 +555,24 @@ footer{background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:26
 
 <script>
 function goTo(id){var e=document.getElementById(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
+
+// About bio read-more toggle
+function toggleBio(){
+  var bio=document.getElementById('aboutBio');
+  var btn=document.getElementById('bioToggle');
+  var expanded=bio.classList.toggle('expanded');
+  btn.classList.toggle('expanded',expanded);
+  btn.querySelector('span').textContent=expanded?'Show Less':'Read More';
+}
+
+// Cursor-follow spotlight on project & goal cards
+document.querySelectorAll('.proj-card, .gc').forEach(function(card){
+  card.addEventListener('mousemove',function(e){
+    var r=card.getBoundingClientRect();
+    card.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    card.style.setProperty('--my',(e.clientY-r.top)+'px');
+  });
+});
 
 // Hamburger
 var hbg=document.getElementById('hbg'),mnav=document.getElementById('mnav');
