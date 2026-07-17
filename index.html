@@ -225,16 +225,21 @@
             <div class="vc-item">Open to Australia or other globally recognised destinations, given the opportunity</div>
           </div>
         </div>
-        <div class="terminal reveal">
-          <div class="term-bar"><div class="tdot td-r"></div><div class="tdot td-y"></div><div class="tdot td-g"></div><span class="term-ttl">security_scan.sh</span></div>
-          <div class="term-body">
+        <div class="terminal reveal" id="interactiveTerminal">
+          <div class="term-bar"><div class="tdot td-r"></div><div class="tdot td-y"></div><div class="tdot td-g"></div><span class="term-ttl">security_scan.sh — interactive</span></div>
+          <div class="term-body" id="termOutput">
             <div><span class="tp">root@kali:~#</span> <span class="tc">./recon.sh target.local</span></div>
             <div><span class="tp">[+]</span> <span class="tc">Host up &middot; ports: 22, 80, 443</span></div>
             <div><span class="tp">root@kali:~#</span> <span class="tc">nikto -h target.local</span></div>
             <div><span class="tw">[!]</span> <span class="tc">Apache/2.4.51 — outdated</span></div>
             <div><span class="th">[*]</span> <span class="tc">CVE-2021-41773 found</span></div>
             <div><span class="tp">[&#10003;]</span> <span class="tc">Stay ethical. &#128274;</span></div>
-            <div><span class="tp">root@kali:~#</span> <span class="tcur"></span></div>
+            <div class="term-hint"><span class="tc">This terminal is live — type <strong>help</strong> and press Enter.</span></div>
+          </div>
+          <div class="term-input-row" id="termInputRow">
+            <span class="tp">root@kali:~#</span>
+            <input type="text" id="termInput" class="term-input" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command input"/>
+            <span class="tcur"></span>
           </div>
         </div>
       </div>
@@ -319,6 +324,27 @@
 </footer>
 
 <button id="goTop" onclick="goTo('hero')" title="Back to top">&#8593;</button>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"><span class="cursor-label" id="cursorLabel"></span></div>
+
+<!-- COMMAND PALETTE -->
+<button id="cmdkHint" onclick="openPalette()" title="Quick navigation">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v4M9 21H5a2 2 0 0 1-2-2v-4M21 15v4a2 2 0 0 1-2 2h-4M3 9V5a2 2 0 0 1 2-2h4"/></svg>
+  <span>Quick Nav</span>
+  <kbd>&#8984;K</kbd>
+</button>
+<div id="palette" onclick="if(event.target===this)closePalette()">
+  <div class="palette-box">
+    <div class="palette-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="paletteInput" placeholder="Jump to a section, or find me elsewhere..." autocomplete="off"/>
+      <kbd>ESC</kbd>
+    </div>
+    <div class="palette-list" id="paletteList"></div>
+  </div>
+</div>
 
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()">
   <div class="lb-inner">
