@@ -347,3 +347,248 @@ document.querySelectorAll('.proj-card, .gc').forEach(function(card){
     });
   });
 })();
+
+/* ============ CUSTOM CURSOR ============ */
+(function(){
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(window.matchMedia('(pointer: coarse)').matches)return;
+  var dot=document.getElementById('cursorDot');
+  var ring=document.getElementById('cursorRing');
+  var label=document.getElementById('cursorLabel');
+  if(!dot||!ring)return;
+
+  var mx=0,my=0,rx=0,ry=0,shown=false;
+
+  document.addEventListener('mousemove',function(e){
+    mx=e.clientX;my=e.clientY;
+    dot.style.left=mx+'px';dot.style.top=my+'px';
+    if(!shown){
+      shown=true;
+      dot.classList.add('show');ring.classList.add('show');
+      rx=mx;ry=my;
+    }
+  });
+  document.addEventListener('mouseleave',function(){
+    dot.classList.remove('show');ring.classList.remove('show');shown=false;
+  });
+
+  function tick(){
+    rx+=(mx-rx)*0.18;ry+=(my-ry)*0.18;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  document.body.classList.add('custom-cursor');
+
+  function setState(state,text){
+    ring.classList.remove('link-hover','action-hover');
+    if(state)ring.classList.add(state);
+    label.textContent=text||'';
+  }
+
+  document.querySelectorAll('a, button, [onclick]').forEach(function(el){
+    el.addEventListener('mouseenter',function(){setState('link-hover','')});
+    el.addEventListener('mouseleave',function(){setState(null,'')});
+  });
+  document.querySelectorAll('input, textarea').forEach(function(el){
+    el.addEventListener('mouseenter',function(){dot.classList.remove('show');ring.classList.remove('show')});
+    el.addEventListener('mouseleave',function(){dot.classList.add('show');ring.classList.add('show');setState(null,'')});
+  });
+  document.querySelectorAll('.proj-card').forEach(function(el){
+    el.addEventListener('mouseenter',function(){setState('action-hover','VIEW')});
+    el.addEventListener('mouseleave',function(){setState(null,'')});
+  });
+  document.querySelectorAll('.gc').forEach(function(el){
+    el.addEventListener('mouseenter',function(){setState('action-hover','GOAL')});
+    el.addEventListener('mouseleave',function(){setState(null,'')});
+  });
+  var lbImg=document.getElementById('lightbox-img');
+  if(lbImg){
+    lbImg.addEventListener('mouseenter',function(){setState('action-hover','CLOSE')});
+    lbImg.addEventListener('mouseleave',function(){setState(null,'')});
+  }
+})();
+
+/* ============ COMMAND PALETTE ============ */
+(function(){
+  var palette=document.getElementById('palette');
+  var input=document.getElementById('paletteInput');
+  var list=document.getElementById('paletteList');
+  var hint=document.getElementById('cmdkHint');
+  if(!palette||!input||!list)return;
+
+  var commands=[
+    {label:'Go to About',sub:'Read about Chiranjit',icon:'&#128100;',action:function(){goTo('about')}},
+    {label:'Go to Skills',sub:'View technical capabilities',icon:'&#9889;',action:function(){goTo('skills')}},
+    {label:'Go to Projects',sub:'NetSafe, NetSafe X, Safe IQ & more',icon:'&#128187;',action:function(){goTo('projects')}},
+    {label:'Go to Security',sub:'Cybersecurity focus areas',icon:'&#128272;',action:function(){goTo('cyber')}},
+    {label:'Go to Goals',sub:'Roadmap & ambitions',icon:'&#127919;',action:function(){goTo('goals')}},
+    {label:'Go to Contact',sub:'Get in touch',icon:'&#9993;',action:function(){goTo('contact')}},
+    {label:'Email Chiranjit',sub:'chiranjitc.official@gmail.com',icon:'&#128231;',action:function(){location.href='mailto:chiranjitc.official@gmail.com'}},
+    {label:'Open GitHub',sub:'github.com/chiranjitchakma',icon:'&#128193;',action:function(){window.open('https://github.com/chiranjitchakma','_blank')}},
+    {label:'Open LinkedIn',sub:'Connect professionally',icon:'&#128188;',action:function(){window.open('https://www.linkedin.com/in/chiranjit-c-a1ab0b31a','_blank')}},
+    {label:'Back to Top',sub:'Return to the hero section',icon:'&#8593;',action:function(){goTo('hero')}}
+  ];
+
+  var activeIndex=0;
+
+  function render(filter){
+    filter=(filter||'').toLowerCase();
+    var filtered=commands.filter(function(c){
+      return c.label.toLowerCase().indexOf(filter)!==-1||c.sub.toLowerCase().indexOf(filter)!==-1;
+    });
+    list.innerHTML='';
+    if(!filtered.length){
+      list.innerHTML='<div class="palette-empty">No matches. Try "projects", "contact", "github"...</div>';
+      return;
+    }
+    filtered.forEach(function(c,i){
+      var el=document.createElement('div');
+      el.className='palette-item'+(i===activeIndex?' active':'');
+      el.innerHTML='<div class="pi-icon">'+c.icon+'</div><div><div class="pi-label">'+c.label+'</div><div class="pi-sub">'+c.sub+'</div></div>';
+      el.addEventListener('click',function(){c.action();closePalette()});
+      el.addEventListener('mousemove',function(){
+        if(activeIndex!==i){activeIndex=i;render(input.value)}
+      });
+      list.appendChild(el);
+    });
+  }
+
+  window.openPalette=function(){
+    palette.classList.add('open');
+    input.value='';
+    activeIndex=0;
+    render('');
+    document.body.style.overflow='hidden';
+    setTimeout(function(){input.focus()},50);
+  };
+  window.closePalette=function(){
+    palette.classList.remove('open');
+    document.body.style.overflow='';
+  };
+
+  input.addEventListener('input',function(){activeIndex=0;render(input.value)});
+  input.addEventListener('keydown',function(e){
+    var items=list.querySelectorAll('.palette-item');
+    if(e.key==='ArrowDown'){e.preventDefault();activeIndex=Math.min(activeIndex+1,items.length-1);render(input.value)}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeIndex=Math.max(activeIndex-1,0);render(input.value)}
+    else if(e.key==='Enter'){
+      var filtered=commands.filter(function(c){
+        var f=input.value.toLowerCase();
+        return c.label.toLowerCase().indexOf(f)!==-1||c.sub.toLowerCase().indexOf(f)!==-1;
+      });
+      if(filtered[activeIndex]){filtered[activeIndex].action();closePalette()}
+    }
+    else if(e.key==='Escape'){closePalette()}
+  });
+
+  document.addEventListener('keydown',function(e){
+    var isMac=navigator.platform.toUpperCase().indexOf('MAC')>=0;
+    var modKey=isMac?e.metaKey:e.ctrlKey;
+    if(modKey&&e.key.toLowerCase()==='k'){
+      e.preventDefault();
+      if(palette.classList.contains('open'))closePalette();else openPalette();
+    }
+    if(e.key==='Escape'&&palette.classList.contains('open'))closePalette();
+  });
+})();
+
+/* ============ INTERACTIVE TERMINAL ============ */
+(function(){
+  var output=document.getElementById('termOutput');
+  var input=document.getElementById('termInput');
+  var row=document.getElementById('termInputRow');
+  if(!output||!input)return;
+
+  var history=[],historyIdx=-1;
+
+  function line(html,cls){
+    var d=document.createElement('div');
+    if(cls)d.className=cls;
+    d.innerHTML=html;
+    output.appendChild(d);
+    output.scrollTop=output.scrollHeight;
+  }
+
+  var commands={
+    help:function(){
+      line('<span class="term-out-accent">Available commands:</span>');
+      line('&nbsp;&nbsp;whoami &mdash; who is Chiranjit');
+      line('&nbsp;&nbsp;skills &mdash; technical skill breakdown');
+      line('&nbsp;&nbsp;projects &mdash; list of projects &amp; status');
+      line('&nbsp;&nbsp;goals &mdash; short &amp; long-term roadmap');
+      line('&nbsp;&nbsp;contact &mdash; how to reach Chiranjit');
+      line('&nbsp;&nbsp;ls &mdash; list site sections');
+      line('&nbsp;&nbsp;sudo hire chiranjit &mdash; try it &#128521;');
+      line('&nbsp;&nbsp;clear &mdash; clear this terminal');
+    },
+    whoami:function(){
+      line('<span class="tc">Chiranjit Chakma &mdash; AI-Driven Developer &amp; Future Cybersecurity Specialist.</span>');
+      line('<span class="tc">BSc Physics, Mathematics &amp; Computer Science &middot; Amrita Vishwa Vidyapeetham, Mysore.</span>');
+    },
+    skills:function(){
+      line('<span class="term-out-accent">skills.json</span>');
+      line('<span class="tc">  AI-Assisted Development ................ 85%</span>');
+      line('<span class="tc">  Logical Thinking ......................... 80%</span>');
+      line('<span class="tc">  HTML &amp; CSS .............................. 70%</span>');
+      line('<span class="tc">  OS Knowledge ............................. 65%</span>');
+      line('<span class="tc">  Cybersecurity Concepts ................... 60%</span>');
+      line('<span class="tc">  Kali Linux ............................... 40%</span>');
+    },
+    projects:function(){
+      line('<span class="term-out-accent">projects/</span>');
+      line('<span class="tp">[ACTIVE]</span> <span class="tc">NetSafe &mdash; Digital Safety &amp; Trusted Device Management</span>');
+      line('<span class="tw">[DEV]</span>&nbsp;&nbsp;&nbsp;<span class="tc">NetSafe X &mdash; Android Cybersecurity Platform</span>');
+      line('<span class="tw">[DEV]</span>&nbsp;&nbsp;&nbsp;<span class="tc">Safe IQ &mdash; AI-Powered Community Safety Platform</span>');
+      line('<span class="th">[PLAN]</span>&nbsp;<span class="tc">Cyber Threat Detection Dashboard</span>');
+    },
+    goals:function(){
+      line('<span class="term-out-accent">Short-term (1&ndash;2yrs):</span> <span class="tc">Finish BSc PMCS, ship 5+ projects, earn CEH/Security+</span>');
+      line('<span class="term-out-accent">Long-term (3&ndash;5yrs):</span> <span class="tc">Master\'s in Cybersecurity &amp; AI, work as a security/AI engineer</span>');
+    },
+    contact:function(){
+      line('<span class="tc">Email:</span> <span class="term-out-accent">chiranjitc.official@gmail.com</span>');
+      line('<span class="tc">Phone:</span> <span class="term-out-accent">+91 8798712804</span>');
+      line('<span class="tc">Location:</span> <span class="term-out-accent">Mysore, Karnataka, India</span>');
+    },
+    ls:function(){
+      line('<span class="tc">about.md&nbsp;&nbsp;skills.json&nbsp;&nbsp;projects/&nbsp;&nbsp;security.sh&nbsp;&nbsp;goals.yaml&nbsp;&nbsp;contact.txt</span>');
+    },
+    clear:function(){
+      output.innerHTML='';
+    }
+  };
+
+  function handleCommand(raw){
+    var cmd=raw.trim();
+    line('<span class="tp">root@kali:~#</span> <span class="term-out-echo">'+cmd.replace(/</g,'&lt;')+'</span>');
+    if(!cmd)return;
+    var lc=cmd.toLowerCase();
+    if(lc==='sudo hire chiranjit'||lc==='sudo hire me'){
+      line('<span class="tp">[&#10003;] Permission granted.</span> <span class="tc">Redirecting to contact section...</span>');
+      setTimeout(function(){goTo('contact')},900);
+      return;
+    }
+    if(commands[lc]){commands[lc]();return}
+    line('<span class="term-out-error">command not found: '+cmd.replace(/</g,'&lt;')+'</span> <span class="tc">&mdash; type \'help\' for a list.</span>');
+  }
+
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      if(input.value.trim()){history.push(input.value);historyIdx=history.length}
+      handleCommand(input.value);
+      input.value='';
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      if(historyIdx>0){historyIdx--;input.value=history[historyIdx]}
+    }else if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(historyIdx<history.length-1){historyIdx++;input.value=history[historyIdx]}
+      else{historyIdx=history.length;input.value=''}
+    }
+  });
+
+  if(row){
+    row.addEventListener('click',function(){input.focus()});
+  }
+})();
